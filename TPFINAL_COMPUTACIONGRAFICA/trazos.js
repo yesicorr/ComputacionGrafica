@@ -1,99 +1,113 @@
-class TrazosFondo {
-  constructor(x, y, obra, tinte, scale = 1) {
+class Trazo {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.imagen = obra;
-    this.color = tinte;
-    this.scale = scale;
-    this.velocidad = 2;
-    this.colorOriginal = tinte;
+    this.angulo = random(360);
+
+    // Variables para vibración
+    this.vibrarX = 0;
+    this.vibrarY = 0;
+    this.vibrarA = 0;
+  }
+
+  actualizarVibracion(activar) {
+    if (activar) {
+      this.vibrarX = random(-6, 6);
+      this.vibrarY = random(-6, 6);
+      this.vibrarA = random(-10, 10);
+    } else {
+      this.vibrarX = 0;
+      this.vibrarY = 0;
+      this.vibrarA = 0;
+    }
   }
 
   dibujar() {
     push();
-    tint(this.color);
-    translate(this.x, this.y);
-    scale(this.scale);
-    image(this.imagen, 0, 0);
+    translate(this.x + this.vibrarX, this.y + this.vibrarY);
+    rotate(radians(this.angulo + this.vibrarA));
+    rectMode(CENTER);
+    fill(100, 150, 200);
+    rect(0, 0, 20, 10);
     pop();
   }
 }
 
 class TrazosDer {
-    constructor(x, y, obra, escala = 1){
-        this.x = x;
-        this.y = y;
-        this.img = obra;
-        this.escala = escala;
-        this.velocidad = 20;
- }
-
-    dibujar(){
-        push();
-        translate(this.x,this.y);
-        scale(this.escala);
-        image(this.img,0,0);
-        pop();
-    }
-
-    moverDerecha() {
-    this.x += 5;
-    if (this.x > width + 100) { // si se sale de la pantalla
-    this.x = -100; // vuelve por la izquierda
-    this.y = random(0, height);
+  constructor(x, y, obra, escala = 1){
+    this.x = x;
+    this.y = y;
+    this.img = obra;
+    this.escala = escala;
+    this.velocidad = 20;
   }
- }
+
+  dibujar(){
+    push();
+    translate(this.x, this.y);
+    scale(this.escala);
+    image(this.img, 0, 0);
+    pop();
+  }
+
+  moverDerecha() {
+    this.x += 5;
+    if (this.x > width + 100) {
+      this.x = -100;
+      this.y = random(0, height);
+    }
+  }
 }
 
 class TrazosIzq {
-    constructor(x, y, obra, escala = 1){
-        this.x = x;
-        this.y = y;
-        this.img = obra;
-        this.escala = escala;
-        this.velocidad = 20;
-    }
+  constructor(x, y, obra, escala = 1){
+    this.x = x;
+    this.y = y;
+    this.img = obra;
+    this.escala = escala;
+    this.velocidad = 20;
+  }
 
-    dibujar(){
-        push();
-        translate(this.x,this.y);
-        scale(this.escala);
-        image(this.img,0,0);
-        pop();
-    }
+  dibujar(){
+    push();
+    translate(this.x, this.y);
+    scale(this.escala);
+    image(this.img, 0, 0);
+    pop();
+  }
 
-   moverIzquierda() {
-  this.x -= 5;
-  if (this.x < -100) { // si se sale de la izquierda
-    this.x = width + 100; // reaparece a la derecha
-    this.y = random(0, height);
-        }
+  moverIzquierda() {
+    this.x -= 5;
+    if (this.x < -100) {
+      this.x = width + 100;
+      this.y = random(0, height);
     }
+  }
 }
 
 class TrazosCent {
-    constructor(x, y, obra, escala = 1){
-        this.x = x;
-        this.y = y;
-        this.img = obra;
-        this.escala = escala;
-        this.ang = 0;
-    }
+  constructor(x, y, obra, escala = 1){
+    this.x = x;
+    this.y = y;
+    this.img = obra;
+    this.escala = escala || 1;
+    this.ang = 0;
+  }
 
-    dibujar(){
-        push();
-        translate(this.x,this.y);
-        rotate(this.ang);
-        scale(this.escala);
-        image(this.img,0,0);
-        pop();
-    }
+  dibujar(){
+    push();
+    translate(this.x, this.y);
+    rotate(this.ang);
+    scale(this.escala);
+    image(this.img, 0, 0);
+    pop();
+  }
 
-    cambiarTamaño(tamNuevo){
-        this.escala = tamNuevo;
-    }
+  cambiarTamaño(tamNuevo){
+    this.escala = tamNuevo;
+  }
 
-    rotar(velocidad = 0.01){
-        this.ang += velocidad;
-    }
+  rotar(velocidad = 0.01){
+    this.ang += velocidad;
+  }
 }

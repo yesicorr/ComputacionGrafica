@@ -1,17 +1,14 @@
-// variables globales 
+// Variables globales
 let AMP_MIN = 0.002;
 let AMP_MAX = 0.035;
 
-let FREC_MIN = 150;  
-let FREC_MAX = 350;  
+let FREC_MIN = 150;
+let FREC_MAX = 350;
 let debug = true;
 
-let umbralGolpe = 0.08;         // amplitud mínima para detectar golpe
-let frecuenciaMaxGolpe = 250;   // frecuencia máxima para considerar ruido 
-let esperaGolpe = 400;          
-let ultiGolpe = 0;
+let estado = ""; // variable para estado "Vibrar"
 
-let cargaTrazos = []; 
+let cargaTrazos = [];
 
 let cTrazosDer = [];
 let cTrazosIzq = [];
@@ -26,7 +23,7 @@ let trazosCent = [];
 let canT = 4;
 
 // limitar el tamaño de la obra
-let margenAncho, margenAlto; 
+let margenAncho, margenAlto;
 
 // precargar la paleta
 let paleta;
@@ -46,7 +43,7 @@ let gestorFrec;
 const pichModel = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
 
 function preload(){
-  paleta = new Paleta ('data/paleta0.jpg');
+  paleta = new Paleta('data/paleta0.jpg');
   precargarTrazos();
 }
 
@@ -96,43 +93,46 @@ function fondo() {
   }
 }
 
-
 function interacciónActiva() {
   let haySonido = amp > 0.02;
 
   if (haySonido && frec_cruda != null) {
-    // grave: mueve a la izquierda
     if (frec_cruda >= 200 && frec_cruda <= 300) {
       for (let i = 0; i < trazosIzq.length; i++) {
         trazosIzq[i].moverIzquierda();
       }
     }
-    // aguda: mueve a la derecha
     if (frec_cruda > 300) {
       for (let i = 0; i < trazosDer.length; i++) {
         trazosDer[i].moverDerecha();
       }
     }
-    // rota el centro
     for (let i = 0; i < trazosCent.length; i++) {
       trazosCent[i].rotar(0.02);
     }
-  }
 
-  // sonido corto y fuerte
-
-  const max_trazos_fondo = 15;
-
-  if (haySonido && amp > umbralGolpe && (frec_cruda < frecuenciaMaxGolpe || !amp_cruda) && (millis() - ultiGolpe > esperaGolpe)) {
-    ultiGolpe = millis();
-    let x = random(150, width);
-    let y = random(0, height);
-    trazos.push(new TrazosFondo(x, y, random(cargaTrazos), paleta.darUnColor()));
-
-    console.log("trazos: "+trazos.length);
-    //para q no se trabe llamamos a la función 'shift()' para q no se acumulen objetos en el array y no se sobrecargue
-    if(trazos.length > max_trazos_fondo){
-      trazos.shift();
+    if (frec_cruda >= 55 && frec_cruda <= 60) {
+      if (estado !== "Vibrar") {
+        estado = "Vibrar";
+        console.log(">> CAMBIO A ESTADO: Vibrar");
+      }
+      for (let t of trazos) {
+        t.actualizarVibracion(true);
+      }
+    } else {
+      if (estado === "Vibrar") {
+        estado = "";
+        for (let t of trazos) {
+          t.actualizarVibracion(false);
+        }
+      }
+    }
+  } else {
+    if (estado === "Vibrar") {
+      estado = "";
+      for (let t of trazos) {
+        t.actualizarVibracion(false);
+      }
     }
   }
 }
@@ -161,7 +161,7 @@ function dibujarTrazos(){
   for(let i = 0; i < canT; i++){
     let x = random(150, width - 150);
     let y = random(0, height);
-    trazos[i] = new TrazosFondo(x, y, cargaTrazos[i], paleta.darUnColor());
+    trazos[i] = new Trazo(x, y); 
   }
 
   for(let i = 0; i < 16; i++){
@@ -185,16 +185,16 @@ function precargarTrazos(){
   for(let i = 0; i < canT; i++){
     cargaTrazos[i] = loadImage('data/trazos/fondo/trazo'+ i +'.png');
   }
-  
-  for(let i = 0; i < 16; i++){  
+
+  for(let i = 0; i < 16; i++){
     cTrazosDer[i] = loadImage('data/trazos/der/trazo'+ i +'.png');
   }
-  
-  for(let i = 0; i < 15; i++){  
-    cTrazosIzq[i] = loadImage('data/trazos/izq/trazo'+ i +'.png'); 
+
+  for(let i = 0; i < 15; i++){
+    cTrazosIzq[i] = loadImage('data/trazos/izq/trazo'+ i +'.png');
   }
-  
-  for(let i = 0; i < 23; i++){  
+
+  for(let i = 0; i < 23; i++){
     cTrazosCent[i] = loadImage('data/trazos/cent/trazo'+ i +'.png');
   }
 }
